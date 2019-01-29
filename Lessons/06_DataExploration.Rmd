@@ -85,7 +85,8 @@ format(today, format = "%a")
 format(today, format = "%b")
 format(today, format = "%y")
 
-USGS.flow.data$datetime <- as.Date(USGS.flow.data$datetime, format = "%m/%d/%y") 
+USGS.flow.data$datetime <- as.character(USGS.flow.data$datetime, format = "%m/%d/%y") 
+class(USGS.flow.data$datetime)
 ```
 
 Note that for every date prior to 1969, R has assigned the date in the 2000s rather than the 1900s. This can be fixed with an `ifelse` statement inside a function. Run through the code below and write what is happening in the comment above each line.
