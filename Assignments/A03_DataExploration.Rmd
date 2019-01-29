@@ -1,6 +1,6 @@
 ---
 title: "Assignment 3: Data Exploration"
-author: "Student Name"
+author: "Keith Bollt"
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -29,14 +29,16 @@ The completed exercise is due on Thursday, 31 January, 2019 before class begins.
 
 Check your working directory, load necessary packages (tidyverse), and upload the North Temperate Lakes long term monitoring dataset for the light, temperature, and oxygen data for three lakes (file name: NTL-LTER_Lake_ChemistryPhysics_Raw.csv). Type your code into the R chunk below.
 ```{r}
-
+getwd()
+library(tidyverse)
+temperate.lakedata.raw <- read.csv("NTL-LTER_Lake_ChemistryPhysics_Raw.csv")
 ```
 
 ## 2) Learn about your system
 
 Read about your dataset in the NTL-LTER README file. What are three salient pieces of information you gained from reading this file?
 
-> ANSWER: 
+> ANSWER: The chemistry and physical data dates from 1984 to 2016. The data is from a study done in Wisconsin. I also learned about the data collection techniques for the data I have (as wel as for the other two data sets on nutrients and carbon, respectively)
 
 ## 3) Obtain basic summaries of your data
 
@@ -50,21 +52,28 @@ Write R commands to display the following information:
 
 ```{r}
 # 1
-
+dim(temperate_lake_data_raw)
 # 2
-
+class(temperate_lake_data_raw)
 # 3
-
+head(temperate_lake_data_raw, 8)
 # 4
-
+class(temperate_lake_data_raw$lakename)
+class(temperate_lake_data_raw$sampledate)
+class(temperate_lake_data_raw$depth)
+class(temperate_lake_data_raw$temperature_C) 
 # 5
-
+summary(temperate_lake_data_raw$lakename)
+summary(temperate_lake_data_raw$depth)
+summary(temperate_lake_data_raw$temperature_C)
 ```
 
 Change sampledate to class = date. After doing this, write an R command to display that the class of sammpledate is indeed date. Write another R command to show the first 10 rows of the date column. 
 
 ```{r}
-
+temperate_lake_data_raw$sampledate <- as.Date(temperate_lake_data_raw$sampledate, format = "%y/%m/%d")
+class(temperate_lake_data_raw$sampledate)
+head(temperate_lake_data_raw, 10)
 ```
 
 Question: Do you want to remove NAs from this dataset? Why or why not?

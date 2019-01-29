@@ -189,7 +189,7 @@ ggplot(USGS.flow.data.complete) +
 ggplot(USGS.flow.data.complete) +
   geom_freqpoly(aes(x = gage.height.mean, color = gage.height.mean.approval), bins = 50) +
   scale_x_continuous(limits = c(0, 10)) +
-  theme(legend.position = "top")
+  theme(legend.position = "top") # this graph colors within the aesthetics as to whether the data is approved or pending
 
 ```
 ### Box-and-whisker plots (function: geom_boxplot)
@@ -218,6 +218,7 @@ ggplot(USGS.flow.data.complete) +
 #
 ggplot(USGS.flow.data.complete) +
   geom_violin(aes(x = gage.height.mean.approval, y = gage.height.mean), draw_quantiles = c(0.25, 0.5, 0.75))
+#the wider the violin, the more data points at this gage height
 ```
 
 Question: what are the pros and cons of each type of frequency graph (histogram, frequency polygon, box-and whisker, violin)?
@@ -231,6 +232,7 @@ Visualize relationships between continuous numerical variables.
 ```{r, fig.height = 3, fig.width = 4}
 ggplot(USGS.flow.data.complete) +
   geom_point(aes(x = discharge.mean, y = gage.height.mean))
+
 
 ```
 
