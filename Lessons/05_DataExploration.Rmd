@@ -51,6 +51,7 @@ At the same time, you should also load your theme if you are doing any data visu
 ```{r}
 # Load package
 library(tidyverse)
+library(utils)
 ```
 
 ### Import your datasets
@@ -64,7 +65,7 @@ You may also import datasets from the Files tab, but this is not recommended sin
 Note: In the Knit menu in the Editor, you will need to specify whether your knit directory should be the document directory or the project directory. For class today, we will need the directory to be set to the project directory so that we can access relative file paths correctly. However, if you are knitting your document into a PDF, it may be desirable to set your knit directory back to the document directory so that the RMarkdown file and the PDF are saved in the same place.
 
 ```{r}
-# Absolute file path (not recommended)
+# Absolute file path (not recommended) It's not recommended because the path will only work on this computer server.
 #read.csv("/Users/katerisalk/Documents/Duke/Courses/Environmental_Data_Analytics/Data/Raw/USGS_Site02085000_Flow_Raw.csv")
 
 # Relative file path (friendly for users regardless of machine)
@@ -74,7 +75,7 @@ USGS.flow.data <- read.csv("./Data/Raw/USGS_Site02085000_Flow_Raw.csv")
 #read.csv("./Data/Raw/USGS_Site02085000_Flow_Raw.csv")
 
 # Another option is to choose with your browser
-# read.csv(file.choose())
+read.csv(file.choose())
 
 # To import .txt files, use read.table rather than read.csv
 #read.table()
@@ -101,27 +102,27 @@ colnames(USGS.flow.data) <- c("agency_cd", "site_no", "datetime",
                               "gage.height.max", "gage.height.max.approval", 
                               "gage.height.min", "gage.height.min.approval", 
                               "gage.height.mean", "gage.height.mean.approval")
-str(USGS.flow.data)
-dim(USGS.flow.data)
-length(USGS.flow.data)
+str(USGS.flow.data) # structure: tels you the structure of the data
+dim(USGS.flow.data) # tells you the dimension
+length(USGS.flow.data) # length tells you the number of columns
 
-head(USGS.flow.data)
+head(USGS.flow.data) #first couple rows of each column
 head(USGS.flow.data, 10)
-tail(USGS.flow.data, 5)
-USGS.flow.data[30000:30005, c(3, 8, 14)]
+tail(USGS.flow.data, 5) # last few rows of each column
+USGS.flow.data[30000:30005, c(3, 8, 14)] # selection a series of columns and rows in the dataset
 
 class(USGS.flow.data$datetime)
 class(USGS.flow.data$discharge.mean)
 class(USGS.flow.data$gage.height.mean)
 
 summary(USGS.flow.data)
-summary(USGS.flow.data$discharge.mean)
+summary(USGS.flow.data$discharge.mean.approval)
 summary(USGS.flow.data$gage.height.mean)
 
 ```
 
 What happened to blank cells in the spreadsheet when they were imported into R?
-> ANSWER: 
+> ANSWER: They become NA in the data
 
 ## TIPS AND TRICKS: SPREADSHEETS
 

@@ -8,7 +8,6 @@ fig_width: 5
 fig_height: 2.5
 editor_options: 
   chunk_output_type: console
-
 ---
 
 ## LESSON OBJECTIVES
@@ -49,7 +48,7 @@ colnames(USGS.flow.data) <- c("agency_cd", "site_no", "datetime",
 str(USGS.flow.data)
 dim(USGS.flow.data)
 
-#head(USGS.flow.data)
+#head(USGS.flow.data) #shows the first six lines
 class(USGS.flow.data$datetime)
 
 ```
@@ -82,9 +81,9 @@ help(as.Date)
 # (code must be uncommented)
 today <- Sys.Date()
 format(today, format = "%B")
-#format(today, format = "")
-#format(today, format = "")
-#format(today, format = "")
+format(today, format = "%a")
+format(today, format = "%b")
+format(today, format = "%y")
 
 USGS.flow.data$datetime <- as.Date(USGS.flow.data$datetime, format = "%m/%d/%y") 
 ```
@@ -98,7 +97,7 @@ USGS.flow.data$datetime <- format(USGS.flow.data$datetime, "%y%m%d")
 #
 create.early.dates <- (function(d) {
        paste0(ifelse(d > 181231,"19","20"),d)
-       })
+       })    # the paste function combines the two things inside the parentheses
 #
 USGS.flow.data$datetime <- create.early.dates(USGS.flow.data$datetime)
 
@@ -117,12 +116,12 @@ summary(USGS.flow.data$gage.height.mean)
 ```
 Question: What types of research questions might make it favorable to remove NAs from a dataset, and what types of research questions might make it favorable to retain NAs in the dataset?
 
-> Answer: 
+> Answer: in social science, a NA may have meaning. You might want to take out the NAs, or leave them in in other circumstances
 
 ```{r}
-USGS.flow.data.complete <- na.omit(USGS.flow.data)
+USGS.flow.data.complete <- na.omit(USGS.flow.data) #creates a dataframe with only non-NA rows
 dim(USGS.flow.data)
-dim(USGS.flow.data.complete)
+dim(USGS.flow.data.complete) #much smaller
 
 mean(USGS.flow.data.complete$discharge.mean)
 sd(USGS.flow.data.complete$discharge.mean)
@@ -139,9 +138,11 @@ Note: each of these approaches utilize the package "ggplot2". We will be coverin
 ### Bar Chart (function: geom_bar)
 
 Visualize count data for categorical variables. 
+ggplot makes graphs
+
 
 ```{r, fig.height = 3, fig.width = 4}
-ggplot(USGS.flow.data.complete, aes(x = discharge.mean.approval)) +
+ggplot(USGS.flow.data.complete, aes(x = discharge.mean.approval)) + #generates graph of approved vs pending data
   geom_bar()
 ```
 
@@ -156,7 +157,7 @@ ggplot(USGS.flow.data.complete) +
 
 #
 ggplot(USGS.flow.data.complete) +
-  geom_histogram(aes(x = discharge.mean), binwidth = 10)
+  geom_histogram(aes(x = discharge.mean), binwidth = 10) #changing the width of the bars to 10
 
 #
 ggplot(USGS.flow.data.complete) +
@@ -165,7 +166,7 @@ ggplot(USGS.flow.data.complete) +
 #
 ggplot(USGS.flow.data.complete, aes(x = discharge.mean)) +
   geom_histogram(binwidth = 10) + 
-  scale_x_continuous(limits = c(0, 500))
+  scale_x_continuous(limits = c(0, 500)) #setting the x axis to be from 0 to 500 in order to zoom in on the majority of data
   
 #
 ggplot(USGS.flow.data.complete) +

@@ -1,6 +1,6 @@
 ---
 title: "Assignment 2: Coding Basics"
-author: "Student Name"
+author: "Keith Bollt"
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -36,6 +36,11 @@ The completed exercise is due on Thursday, 24 January, 2019 before class begins.
 4. Insert comments in your code to describe what you are doing.
 
 ```{r}
+sequence_for_q1 <- seq(1,100)# I am naming and defining my sequence
+sequence_for_q1# I am telling R to make my sequence now.
+median (sequence_for_q1)
+mean(sequence_for_q1)# I am taking the median and mean, respectively, for the sequence I just created.
+mean (sequence_for_q1) > median(sequence_for_q1) # This is a logical function. Because the answer is false, the mean is not greater than the median
 
 ```
 
@@ -50,21 +55,43 @@ The completed exercise is due on Thursday, 24 January, 2019 before class begins.
 8. Label the columns of your data frame with informative titles.
 
 ```{r}
+vector_names <- c("Keith","Steven","Juan","Quentin") # character vector
+vector_names
+vector_score <- c(49.998, 95, 90, 92) #numeric vector
+vector_score
+vector_pass <- c(FALSE, TRUE, TRUE, TRUE) #logical vector
+vector_pass
+Gradebook <- data.frame(vector_names, vector_score, vector_pass)
+Gradebook
+names(Gradebook) <- c("Name", "Grade", "Did They Pass?")
+View(Gradebook)
+
+
+
 
 ```
 
 9. QUESTION: How is this data frame different from a matrix?
 
-> ANSWER: 
+> ANSWER: A matrix has information of the same type, be it numerical, character or logical, in each column. A data frame can have more than one type of information in it.
 
 10. Create a function with an if/else statement. Your function should determine whether a test score is a passing grade of 50 or above (TRUE or FALSE). You will need to choose either the `if` and `else` statements or the `ifelse` statement. The name of your function should be informative.
 
 11. Apply your function to the vector with test scores that you created in number 5. 
 
 ```{r}
-
+Who_Should_I_Pass <- function(y) {
+if (y>=50)
+  {TRUE}
+  else {FALSE}      #This function did not work
+}
+Who_Should_I_Pass (vector_score)
+Who_Should_I_Pass2 <- function(z) {
+  ifelse(z>= 50, TRUE, FALSE)     # But this one did!
+}
+Who_Should_I_Pass2(vector_score)
 ```
 
 12. QUESTION: Which option of `if` and `else` vs. `ifelse` worked? Why?
 
-> ANSWER: 
+> ANSWER: Only ifelse worked. I was using the function on a vector, and the 'if' and 'else' function does not work on vectors. As the warning indicates, it was only able to solve the function for the first of the four scores.

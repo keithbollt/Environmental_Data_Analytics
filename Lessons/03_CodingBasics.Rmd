@@ -5,7 +5,7 @@ date: "Spring 2019"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ## LESSON OBJECTIVES
@@ -108,7 +108,7 @@ longnameforillustration
 
 ```{r}
 long_name_for_illustration <- 11
-
+long_name_for_illustration
 ```
 
 ### Functions
@@ -141,7 +141,7 @@ For now, here are some ways to access the help tools in R:
 Within your R code, it is often useful to include notes about your workflow. So that these aren't interpreted by the software as code, precede the notes with a `#` sign. Your editor will display this comment as a different color to indicate it will not be run in the console. Comments can be placed on their own lines or at the end of a line of code.
 ```{r}
 # I am demonstrating a comment here. 
-
+# abc
 1 + 1 # This is a simple math problem
 ```
 
