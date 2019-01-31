@@ -31,7 +31,7 @@ Check your working directory, load necessary packages (tidyverse), and upload th
 ```{r}
 library(tidyverse)
 getwd()
-temperate_lake_data_raw <- read.csv("V:/ENV_872_Project_Directory/Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv")
+temperate.lakedata.raw <- read.csv("NTL-LTER_Lake_ChemistryPhysics_Raw.csv")
 ```
 
 ## 2) Learn about your system
