@@ -1,6 +1,6 @@
 ---
 title: "Assignment 4: Data Wrangling"
-author: "Student Name"
+author: "Keith Bollt"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -34,8 +34,33 @@ The completed exercise is due on Thursday, 7 February, 2019 before class begins.
 
 ```{r}
 #1
+getwd()
+library(tidyverse)
+epa.air.o3.2017.newer <- read.csv("./Data/Raw/EPAair_O3_NC2017_raw.csv")
+epa.air.o3.2018.4 <- read.csv("./Data/Raw/EPAair_O3_NC2018_raw.csv")
+epa.air.pm25.2017.newer <- read.csv("./Data/Raw/EPAair_pm25_NC2017_raw.csv")
+epa.air.pm25.2018.newer <- read.csv("./Data/Raw/EPAair_pm25_NC2018_raw.csv")
 
 #2
+head(epa.air.o3.2017)
+colnames(epa.air.o3.2017)
+summary(epa.air.o3.2017)
+dim(epa.air.o3.2017)
+
+head(epa.air.o3.2018)
+colnames(epa.air.o3.2018)
+summary(epa.air.o3.2018)
+dim(epa.air.o3.2018)
+
+head(epa.air.pm25.2017)
+colnames(epa.air.pm25.2017)
+summary(epa.air.pm25.2017)
+dim(epa.air.pm25.2017)
+
+head(epa.air.pm25.2018)
+colnames(epa.air.pm25.2018)
+summary(epa.air.pm25.2018)
+dim(epa.air.pm25.2018)
 ```
 
 ## Wrangle individual datasets to create processed files.
@@ -46,13 +71,38 @@ The completed exercise is due on Thursday, 7 February, 2019 before class begins.
 
 ```{r}
 #3
+epa.air.o3.2017.newer$Date <- as.Date(epa.air.o3.2017.newer$Date, format = "%m/%d/%y")
+class(epa.air.o3.2017.newer$Date) #checking my work
+
+epa.air.o3.2018.4$Date <- as.Date(epa.air.o3.2018.4$Date, format = "%m/%d/%y")
+class(epa.air.o3.2018.4$Date)
+epa.air.pm25.2017.newer$Date <- as.Date(epa.air.pm25.2017.newer$Date, format = "%m/%d/%y")
+epa.air.pm25.2018.newer$Date <- as.Date(epa.air.pm25.2018.newer$Date, format = "%m/%d/%y")
+class(epa.air.pm25.2018.newer$Date) # checking my work
 
 #4
+epa.air.o3.2017.select <- select(epa.air.o3.2017.newer, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+
+epa.air.o3.2018.select <- select(epa.air.o3.2018.4, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+
+epa.air.pm25.2017.select <- select(epa.air.pm25.2017.newer, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+
+epa.air.pm25.2018.select <- select(epa.air.pm25.2018.newer, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 
 #5
+epa.air.pm25.2017.fill2 <- mutate(epa.air.pm25.2017.select, AQS_PARAMETER_DESC = "PM25")
+epa.air.pm25.2018.fill2 <- mutate(epa.air.pm25.2018.select, AQS_PARAMETER_DESC = "PM25")
 
 #6
+write.csv(epa.air.o3.2017.select, row.names = FALSE, 
+          file ="./Data/Processed/epa.air.o3.2017.select_Processed.csv")
+write.csv(epa.air.o3.2018.select, row.names = FALSE, 
+          file ="./Data/Processed/epa.air.o3.2018.select_Processed.csv")
 
+write.csv(epa.air.pm25.2017.fill2, row.names = FALSE, 
+          file ="./Data/Processed/epa.air.pm25.2017_Processed.csv")
+write.csv(epa.air.pm25.2018.fill2, row.names = FALSE, 
+          file ="./Data/Processed/epa.air.pm25.2018_Processed.csv")
 ```
 
 

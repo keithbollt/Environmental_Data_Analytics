@@ -1,6 +1,6 @@
 ---
 title: "Assignment 3: Data Exploration"
-author: "Keith Bollt"
+author: "Student Name"
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -29,16 +29,17 @@ The completed exercise is due on Thursday, 31 January, 2019 before class begins.
 
 Check your working directory, load necessary packages (tidyverse), and upload the North Temperate Lakes long term monitoring dataset for the light, temperature, and oxygen data for three lakes (file name: NTL-LTER_Lake_ChemistryPhysics_Raw.csv). Type your code into the R chunk below.
 ```{r}
-library(tidyverse)
 getwd()
-temperate_lake_data_raw <- read.csv("V:/ENV_872_Project_Directory/Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv")
+library(tidyverse)
+read.csv(file.choose("NTL-LTER_Lake_ChemistryPhysics_Raw.csv"))
+read.csv(file.choose("NTL-LTER_Lake_ChemistryPhysics_Raw.csv"))
 ```
 
 ## 2) Learn about your system
 
 Read about your dataset in the NTL-LTER README file. What are three salient pieces of information you gained from reading this file?
 
-> ANSWER: The chemistry and physical data dates from 1984 to 2016. The data is from a study done in Wisconsin. I also learned about the data collection techniques for the data I have (as wel as for the other two data sets on nutrients and carbon, respectively)
+> ANSWER: 
 
 ## 3) Obtain basic summaries of your data
 
@@ -52,33 +53,26 @@ Write R commands to display the following information:
 
 ```{r}
 # 1
-dim(temperate_lake_data_raw)
+
 # 2
-class(temperate_lake_data_raw)
+
 # 3
-head(temperate_lake_data_raw, 8)
+
 # 4
-class(temperate_lake_data_raw$lakename)
-class(temperate_lake_data_raw$sampledate)
-class(temperate_lake_data_raw$depth)
-class(temperate_lake_data_raw$temperature_C) 
+
 # 5
-summary(temperate_lake_data_raw$lakename)
-summary(temperate_lake_data_raw$depth)
-summary(temperate_lake_data_raw$temperature_C)
+
 ```
 
 Change sampledate to class = date. After doing this, write an R command to display that the class of sammpledate is indeed date. Write another R command to show the first 10 rows of the date column. 
 
 ```{r}
-temperate_lake_data_raw$sampledate <- as.Date(temperate_lake_data_raw$sampledate, format = "%m/%d/%y")
-class(temperate_lake_data_raw$sampledate)
-head(temperate_lake_data_raw, 10)
+
 ```
 
 Question: Do you want to remove NAs from this dataset? Why or why not?
 
-> ANSWER: No. Some of the NAs have scientific meaning and we want to keep them. For example, take irradiance. Irradiance is energy flux in W/m^2, and below a certain depth in each lake, it has a NA value. This tells us that sunlight is not penetrating to the bottom of the lake. 
+> ANSWER: 
 
 
 ## 4) Explore your data graphically
@@ -95,38 +89,30 @@ Write R commands to display graphs depicting:
 
 ```{r}
 # 1
-ggplot(temperate_lake_data_raw, aes(x= temperature_C, color= lakename)) + 
-  geom_bar()
+
 # 2
-ggplot(temperate_lake_data_raw) +
-  geom_histogram(aes(x= temperature_C))
+
 # 3
-ggplot(temperate_lake_data_raw) +
-  geom_histogram(aes(x= temperature_C), bins = 12)
+
 # 4
-ggplot(temperate_lake_data_raw) +
-  geom_freqpoly(aes(x = temperature_C, color = lakename), bins = 50)
- 
+
 # 5
-ggplot(temperate_lake_data_raw) +
-  geom_boxplot(aes(x= lakename, y= temperature_C))
+
 # 6
-ggplot(temperate_lake_data_raw) +
-  geom_boxplot(aes(x= depth, y= temperature_C, group = cut_width(depth, 0.25)))
+
 # 7 
-ggplot(temperate_lake_data_raw) +
-  geom_point(aes(x= depth, y= temperature_C))
+
 ```
 ## 5) Form questions for further data analysis
 
 What did you find out about your data from the basic summaries and graphs you made? Describe in 4-6 sentences.
 
-> ANSWER: The lakes have several shared patterns and several unique characteristics. This makes sense because they are geographically and geomorphologically similar but not identical. The deeper you go in the lake, the colder the water gets. However, some lakes are warmer or colder than others. The sharp increase in frequency of 4 to 8 degree Celsius water in all lakes indicates the presense of a thermocline in these lakes. From the scatterplot, we see there was a systematic method of collecting the data.
+> ANSWER: 
 
 What are 3 further questions you might ask as you move forward with  analysis of this dataset?
 
-> ANSWER 1: Where does the thermocline start on each lake?
+> ANSWER 1: 
 
-> ANSWER 2: Are there correlations between temperature at a given depth and other information we might know about the lake, such as the presense of springs?
+> ANSWER 2: 
 
-> ANSWER 3: How has lake temperature changed over time?
+> ANSWER 3: 
