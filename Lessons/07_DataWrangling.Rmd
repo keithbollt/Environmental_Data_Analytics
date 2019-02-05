@@ -1,5 +1,5 @@
 ---
-title: "6: Data Exploration"
+title: "7: Data Wrangling"
 author: "Environmental Data Analytics | Kateri Salk"
 date: "Spring 2019"
 output: pdf_document
@@ -117,7 +117,12 @@ NTL.phys.data.Tuesdaythe90s <- filter(NTL.phys.data, lakename == "Tuesday Lake",
 
 ```
 Question: Why don't we filter using row numbers?
+<<<<<<< HEAD
 > ANSWER: rows change if you filter them. also, rows don't have much information in their title, and you would need to check what rows you want
+=======
+
+> ANSWER: 
+>>>>>>> 9e51cd169427ab7623c3dbe57fa52f82c357f150
 
 ### Arrange
 
