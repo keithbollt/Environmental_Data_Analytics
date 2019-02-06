@@ -169,6 +169,6 @@ EPA.aqi.by.site <-
             )
 
 #13
-
+View(EPA.mean.AQI.by.month2)
 ```
 
