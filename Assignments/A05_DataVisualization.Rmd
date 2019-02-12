@@ -1,6 +1,6 @@
 ---
 title: "Assignment 5: Data Visualization"
-author: "Student Name"
+author: "Keith Bollt"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -34,8 +34,30 @@ The completed exercise is due on Thursday, 14 February, 2019 before class begins
 
 ```{r}
 #1
+library(tidyverse)
+library(ggplot2)
+lake.chem.nutrients.tidy <- 
+  read.csv("V:/ENV_872_Project_Directory/Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv")
+lake.chem.nutrients.gathered <-
+  read.csv("V:/ENV_872_Project_Directory/Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaulGathered_Processed.csv")
+usgs.A05 <- 
+  read.csv("V:/ENV_872_Project_Directory/Data/raw/USGS_Site02085000_Flow_Raw.csv")
+neonicotinoids.A05 <-
+   read.csv("V:/ENV_872_Project_Directory/Data/raw/ECOTOX_Neonicotinoids_Mortality_raw.csv")
 
 #2
+data.class(usgs.A05$datetime)
+usgs.A05$datetime <- as.Date(usgs.A05$datetime, format = "%d/%m/%y")
+create.early.dates <- (function(d) {
+       paste0(ifelse(d > 181231,"20","19"),d)
+       }) 
+usgs.A05$datetime <- create.early.dates(usgs.A05$datetime)
+usgs.A05$datetime <- as.Date(usgs.A05$datetime, format = "%Y%m%d") 
+
+data.class(lake.chem.nutrients.tidy$sampledate)
+lake.chem.nutrients.tidy$sampledate <- as.Date(lake.chem.nutrients.tidy$sampledate, format = "%Y-%m-%d")
+data.class(lake.chem.nutrients.gathered$sampledate)
+lake.chem.nutrients.gathered$sampledate <- as.Date(lake.chem.nutrients.gathered$sampledate, format = "%Y-%m-%d")
 ```
 ## Define your theme
 3. Build a theme and set it as your default theme.
