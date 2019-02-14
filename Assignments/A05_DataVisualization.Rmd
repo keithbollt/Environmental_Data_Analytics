@@ -47,12 +47,14 @@ neonicotinoids.A05 <-
 
 #2
 data.class(usgs.A05$datetime)
-usgs.A05$datetime <- as.Date(usgs.A05$datetime, format = "%d/%m/%y")
+usgs.A05$datetime <- as.Date(usgs.A05$datetime, format = "%m/%d/%y")
+usgs.A05$datetime <- format(usgs.A05$datetime, "%y%m%d") 
 create.early.dates <- (function(d) {
-       paste0(ifelse(d > 181231,"20","19"),d)
+       paste0(ifelse(d > 181231,"19","20"),d)
        }) 
 usgs.A05$datetime <- create.early.dates(usgs.A05$datetime)
-usgs.A05$datetime <- as.Date(usgs.A05$datetime, format = "%Y%m%d") 
+usgs.A05$datetime <- as.Date(usgs.A05$datetime, format = "%Y%m%d")
+
 
 data.class(lake.chem.nutrients.tidy$sampledate)
 lake.chem.nutrients.tidy$sampledate <- as.Date(lake.chem.nutrients.tidy$sampledate, format = "%Y-%m-%d")
