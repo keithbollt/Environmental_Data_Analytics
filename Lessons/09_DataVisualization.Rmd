@@ -169,9 +169,10 @@ print(NvsP)
 # 1. 
 # Plot AQI values for ozone by PM2.5, colored by site. 
 # Add a line of best fit for the linear regression of these variables.
-  ggplot(EPAair, aes(x = PM25, y = Ozone, color = Site.Name)) +  # the color is defined inside the aesthetics,each site gets its own trend line because aesthetics were defined at the top
+lesson9_plot <- ggplot(EPAair, aes(x = PM2.5, y = Ozone, color = Site.Name)) +  # the color is defined inside the aesthetics,each site gets its own trend line because aesthetics were defined at the top
   geom_point() +
   geom_smooth(method = lm)
+print(lesson9_plot)
 
   
 ```

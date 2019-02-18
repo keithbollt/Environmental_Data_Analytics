@@ -96,11 +96,11 @@ print(phosphorus_vs_phosphate)
 
 ```{r}
 #5
-nutrients_by_date2 <- ggplot(lake.chem.nutrients.gathered, aes(x= sampledate, y= concentration, color = depth))+
+nutrients_by_date2 <- ggplot(lake.chem.nutrients.gathered, aes(x= sampledate, y= concentration, shape = lakename, color = depth))+
   geom_point()+
   ylab(expression("Concentration (μg/L)"))+
   xlab(expression("Date"))+
-  facet_grid(nutrient ~ concentration)
+  
 print(nutrients_by_date2)
 
 ```
