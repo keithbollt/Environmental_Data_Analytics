@@ -96,8 +96,8 @@ print(phosphorus_vs_phosphate)
 
 ```{r}
 #5
-graph5 <- ggplot(subset(lake.chem.nutrients.gathered, lakename == "Peter Lake"), aes(x= sampledate, y= concentration, color = depth)+
-  geom_point())+
+graph5 <- ggplot(subset(lake.chem.nutrients.gathered, lakename == "Peter Lake"), aes(x= sampledate, y= concentration, color = depth))+
+  geom_point()+
   ylab(expression("Concentration (μg/L)"))+
   xlab(expression("Date"))+
   facet_grid(concentration ~ nutrient)
@@ -111,26 +111,39 @@ print(graph5)
 
 ```{r}
 #6
-Discharge_v_date <- ggplot(usgs.A05, aes(x = datetime, y = X165986_00060_00001))+
+Discharge_v_date_smooth <- ggplot(usgs.A05, aes(x = datetime, y = X165986_00060_00001))+
   geom_point()+
-  geom_line()+
   geom_smooth()+
   xlab(expression("Date"))+
   ylab(expression("Discharge in CFS"))
+print(Discharge_v_date_smooth)
 
-ggarrange (Discharge_v_date)
+Discharge_v_date_line <- ggplot(usgs.A05, aes(x = datetime, y = X165986_00060_00001))+
+  geom_point()+
+  geom_line()+
+  xlab(expression("Date"))+
+  ylab(expression("Discharge in CFS"))
+print(Discharge_v_date_line)
 
-print(Discharge_v_date)
+library(ggpubr)
+ggarrange(Discharge_v_date_smooth, Discharge_v_date_line)
+
 ```
 Question: How do these two types of lines affect your interpretation of the data?
 
-> Answer:
+> Answer: The gg_smooth plot creates a trendline, and suggests a temporal trend over time (whether or not a strongly correlated trend actually exists). It also draws a trend right through the years for which no data exists. On the other hand, the gg_line plot connects each point to the previous point. Among other things, this has the effect of blurring out densly plotted points because they are covered by the line itself, and also disguising statistical outliers as being more typical of the dataset.
 
 7. [ECOTOX Neonicotinoids] Plot the concentration, divided by chemical name. Choose a geom that accurately portrays the distribution of data points.
 
 ```{r}
 #7 
 
+neonic <- ggplot(subset(neonicotinoids.A05, Conc..Units..Std. == "AL mg/L"), aes(x = Chemical.Name, y = Conc..Mean..Std., fill = as.factor(Chemical.Name)))+
+  geom_bar(stat = "identity", position = "dodge")+
+  xlab(expression("Chemical Name"))+
+  ylab(expression("Concentration (mg/L)"))
+
+print(neonic)
 ```
 
 
