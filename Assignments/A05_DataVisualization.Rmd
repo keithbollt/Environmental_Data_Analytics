@@ -80,12 +80,12 @@ Hint: a good way to build graphs is to make them ugly first and then create more
 
 ```{r}
 #4
-phosphorus_vs_phosphate <- ggplot(lake.chem.physics.tidy, aes(x = po4, y = tp_ug, color = depth, shape = lakename))+
+phosphorus_vs_phosphate <- ggplot(lake.chem.nutrients.tidy, aes(x = po4, y = tp_ug, color = depth, shape = lakename))+
   geom_point()+
   xlab(expression ("Phosphate (μg/L)"))+
   ylab(expression ("Total Phosphorus (μg/L)"))+
   labs(shape = "Lake")+
-  geom_smooth(method = lm, color = "blue")
+  geom_smooth(method = lm, color = "black")
 
 print(phosphorus_vs_phosphate)
 
@@ -96,12 +96,13 @@ print(phosphorus_vs_phosphate)
 
 ```{r}
 #5
-nutrients_by_date2 <- ggplot(lake.chem.nutrients.gathered, aes(x= sampledate, y= concentration, shape = lakename, color = depth))+
-  geom_point()+
+graph5 <- ggplot(subset(lake.chem.nutrients.gathered, lakename == "Peter Lake"), aes(x= sampledate, y= concentration, color = depth)+
+  geom_point())+
   ylab(expression("Concentration (μg/L)"))+
   xlab(expression("Date"))+
+  facet_grid(concentration ~ nutrient)
   
-print(nutrients_by_date2)
+print(graph5)
 
 ```
 
@@ -110,7 +111,16 @@ print(nutrients_by_date2)
 
 ```{r}
 #6
+Discharge_v_date <- ggplot(usgs.A05, aes(x = datetime, y = X165986_00060_00001))+
+  geom_point()+
+  geom_line()+
+  geom_smooth()+
+  xlab(expression("Date"))+
+  ylab(expression("Discharge in CFS"))
 
+ggarrange (Discharge_v_date)
+
+print(Discharge_v_date)
 ```
 Question: How do these two types of lines affect your interpretation of the data?
 
