@@ -73,6 +73,7 @@ lake.chem.nutrients.gathered$sampledate <- as.Date(lake.chem.nutrients.gathered$
 mytheme <- theme_classic(base_size = 12.92)+
   theme(axis.text = element_text(color = "blue"),
   legend.position = "top")
+theme_set(mytheme)
 ```
 
 ## Create graphs

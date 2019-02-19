@@ -30,7 +30,7 @@ PeterPaul.nutrients$sampledate <- as.Date(PeterPaul.nutrients$sampledate, format
 PeterPaul.nutrients <- filter(PeterPaul.nutrients, depth_id > 0)
 
 # set depth_id to factor
-PeterPaul.nutrients$depth_id <- as.factor(PeterPaul.nutrients$depth_id)
+PeterPaul.nutrients$depth_id <- as.factor(PeterPaul.nutrients$depth_id)  # we want to use depth as a factor later on
 
 mytheme <- theme_classic(base_size = 14) +
   theme(axis.text = element_text(color = "black"), 
@@ -44,6 +44,8 @@ theme_set(mytheme)
 The one-sample test (model of the mean), two-sample t-test, analysis of variance (ANOVA), and linear regression are all special cases of the **generalized linear model** (GLM). The GLM also includes analyses not covered in this class, including logistic regression, multinomial regression, chi square, and log-linear models. The common characteristic of general linear models is the expression of a continuous response variable as a linear combination of the effects of categorical or continuous explanatory variables, plus an error term that expresses the random error associated with the coefficients of all explanatory variables. The explanatory variables comprise the deterministic component of the model, and the error term comprises the stochastic component of the model. Historically, artificial distinctions were made between linear models that contained categorical and continuous explanatory variables, but this distinction is no longer made. The inclusion of these models within the umbrella of the GLM allows models to fit the main effects of both categorical and continuous explanatory variables as well as their interactions. 
 
 ### Choosing a model from your data: A "cheat sheet"
+
+The type of test you runs depends on the type of data you are testing:
 
 **T-test:** Continuous response, one categorical explanatory variable with two categories (or comparison to a single value if a one-sample test).
 
@@ -73,18 +75,20 @@ Are Ozone levels below the threshold for "good" AQI index (0-50)?
 summary(EPAair$Ozone)
 
 # Evaluate assumption of normal distribution
-shapiro.test(EPAair$Ozone)
+shapiro.test(EPAair$Ozone)  # the shapiro test tells you if the data is well approximated by a normal distribution
 ggplot(EPAair, aes(x = Ozone)) +
   geom_histogram(stat = "count")
-qqnorm(EPAair$Ozone); qqline(EPAair$Ozone)
+qqnorm(EPAair$Ozone); qqline(EPAair$Ozone) # the closer the dots are to the line, the more normal the data distribution is
 
-O3.onesample <- t.test(EPAair$Ozone, mu = 50, alternative = "less")
+O3.onesample <- t.test(EPAair$Ozone, mu = 50, alternative = "less") # t.test is a t test; we need to specify that we want it to be less than 50 (less than, not just different)
 O3.onesample
 ```
 
 What information does the output give us? How might we report this information in a report?
 
-> ANWSER:
+> ANWSER: The lower the t value is from 0, the stronger the finding.
+The mean of x is about 36.
+answer: Ozone AQI values in 2017-2018 were significantly lower than 50 (one-sample t-test)
 
 ### Two-sample t-test
 The two-sample *t* test is used to test the hypothesis that the mean of two samples is equivalent. Unlike the one-sample tests, a two-sample test requires a second assumption that the variance of the two groups is equivalent. Are Ozone levels different between Blackstone and Bryson City?
@@ -92,15 +96,15 @@ The two-sample *t* test is used to test the hypothesis that the mean of two samp
 ```{r}
 shapiro.test(EPAair$Ozone[EPAair$Site.Name == "Blackstone"])
 shapiro.test(EPAair$Ozone[EPAair$Site.Name == "Bryson City"])
-var.test(EPAair$Ozone ~ EPAair$Site.Name)
+var.test(EPAair$Ozone ~ EPAair$Site.Name) # does a variance test on two samples
 
 ggplot(EPAair, aes(x = Ozone, color = Site.Name)) +
   geom_freqpoly(stat = "count")
 
 # Format as a t-test
-O3.twosample <- t.test(EPAair$Ozone ~ EPAair$Site.Name)
+O3.twosample <- t.test(EPAair$Ozone ~ EPAair$Site.Name) # two-sample t test
 O3.twosample
-O3.twosample$p.value
+O3.twosample$p.value  # the p value is very small, so the means are significantly different and we reject the null hypothesis that they are equivalent
 
 # Format as a GLM
 O3.twosample2 <- lm(EPAair$Ozone ~ EPAair$Site.Name)
@@ -111,10 +115,13 @@ summary(O3.twosample2)
 When we wish to avoid the assumption of normality, we can apply *distribution-free*, or non-parametric, methods in the form of the Wilcoxon rank sum (Mann-Whitney) test. The Wilcoxon test replaces the data by their rank and calculates the sum of the ranks for each group. Notice that the output of the Wilcoxon test is more limited than its parametric equivalent.
 
 ```{r}
-O3.onesample.wilcox <- wilcox.test(EPAair$Ozone, mu = 50, alternative = "less")
+O3.onesample.wilcox <- wilcox.test(EPAair$Ozone, mu = 50, alternative = "less") # a wilcox test is used for this situation
 O3.onesample.wilcox
 O3.twosample.wilcox <- wilcox.test(EPAair$Ozone ~ EPAair$Site.Name)
 O3.twosample.wilcox
+
+# fewer results/less explanatory power because we are not assuming that the data is normally distributed.
+# it still spits out a p-value
 ```
 
 ### One-way ANOVA
@@ -130,29 +137,30 @@ ggplot(EPAair, aes(x = PM2.5, color = Site.Name)) +
   geom_freqpoly(stat = "count")
 qqnorm(EPAair$PM2.5); qqline(EPAair$PM2.5)
 
-bartlett.test(EPAair$PM2.5 ~ EPAair$Site.Name)
+bartlett.test(EPAair$PM2.5 ~ EPAair$Site.Name)  # a bartlett test does a one-way anova
 
 # Format as a GLM
 PM2.5.anova <- lm(EPAair$PM2.5 ~ EPAair$Site.Name)
 summary(PM2.5.anova)
+# always sets the first alphabetical sample as the intercept. to get the other two values, subtract the estimated difference
 
-# Format as an aov
+# Format as an aov. This doesn't tell you the differences between the means, so run a Tukey test
 PM2.5.anova2 <- aov(EPAair$PM2.5 ~ EPAair$Site.Name)
 summary(PM2.5.anova2)
 
-# Run a post-hoc test for pairwise differences
+# Run a post-hoc test for pairwise differences, and whether all combinations of the three sites are significantly different from eachother
 TukeyHSD(PM2.5.anova2)
 
 # Plot the results
 # How might you edit this graph to make it attractive?
-# How might you illustrate significant differences?
+# How might you illustrate significant differences? Demarcate the statistically different site from the similar sites
 PM2.5.anova.plot <- ggplot(EPAair, aes(x = Site.Name, y = PM2.5)) +
   geom_violin(draw_quantiles = 0.5)
 print(PM2.5.anova.plot)
 ```
 What information does the output give us? How might we report this information in a report?
 
-> ANSWER:
+> ANSWER:  (ANOVA: mean estimates for each site and whether they are statistically different, p value < 0.0001, df= 1898, name the tests done)
 
 ### Non-parametric equivalent of ANOVA: Kruskal-Wallis Test
 As with the Wilcoxon test, the Kruskal-Wallis test is the non-parametric counterpart to the one-way ANOVA. Here, the data from two or more independent samples are replaced with their ranks without regard to the grouping AND based on the between-group sum of squares calculations. 
@@ -163,9 +171,9 @@ To analyze specific pairs in the data, you must use a *post hoc* test. These inc
 
 ```{r}
 PM2.5.kw <- kruskal.test(EPAair$PM2.5 ~ EPAair$Site.Name)
-PM2.5.kw
+PM2.5.kw # like the wilcox test for anova
 
-# There are two functions to run the Dunn Test
+# There are two functions to run the Dunn Test (which is like the Tukey test)
 # dunn.test(EPAair$PM2.5, EPAair$Site.Name, kw = T, 
 #           table = F, list = T, method = "holm", altp = T)   #From package dunn.test
 # dunnTest(EPAair$PM2.5, EPAair$Site.Name)                    #From package FSA
@@ -177,14 +185,14 @@ A two-way ANOVA allows us to examine the effects of two categorical explanatory 
 
 ```{r}
 TNanova.main <- lm(PeterPaul.nutrients$tn_ug ~ PeterPaul.nutrients$lakename + PeterPaul.nutrients$depth_id)
-summary(TNanova.main)
+summary(TNanova.main) # the + puts in a second variable to test
 
 TNanova.main2 <- aov(PeterPaul.nutrients$tn_ug ~ PeterPaul.nutrients$lakename + PeterPaul.nutrients$depth_id)
-summary(TNanova.main2)
+summary(TNanova.main2)  # the output tells you the anova difference between the lakes, then tells you the anova difference between the depths for both lakes
 
 TukeyHSD(TNanova.main2)
 
-# Plot the results
+# Plot the results: boxplot, dotplot, violin plot all work for GLMs
 # How might you edit this graph to make it attractive?
 # How might you illustrate significant differences?
 TNanova.plot <- ggplot(PeterPaul.nutrients, aes(x = lakename, y = tn_ug, color = depth_id)) +
@@ -199,7 +207,7 @@ The output gives test statistics for each explanatory variable as well as the in
 
 ```{r}
 TNanova.interaction <- aov(PeterPaul.nutrients$tn_ug ~ PeterPaul.nutrients$lakename * PeterPaul.nutrients$depth_id)
-summary(TNanova.interaction)
+summary(TNanova.interaction)  # lets you look at the interaction between the two variables we were testing
 
 ```
 
