@@ -7,6 +7,10 @@ editor_options:
   chunk_output_type: console
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
 ## OVERVIEW
 
 This exercise accompanies the lessons in Environmental Data Analytics (ENV872L) on data wrangling. 
@@ -82,8 +86,8 @@ Hint: a good way to build graphs is to make them ugly first and then create more
 #4
 phosphorus_vs_phosphate <- ggplot(lake.chem.nutrients.tidy, aes(x = po4, y = tp_ug, color = depth, shape = lakename))+
   geom_point()+
-  xlab(expression ("Phosphate (μg/L)"))+
-  ylab(expression ("Total Phosphorus (μg/L)"))+
+  xlab(expression ("Phosphate (micro g/L)"))+
+  ylab(expression ("Total Phosphorus (micro g/L)"))+
   labs(shape = "Lake")+
   geom_smooth(method = lm, color = "black")
 
@@ -98,13 +102,13 @@ print(phosphorus_vs_phosphate)
 #5
 graph5 <- ggplot(subset(lake.chem.nutrients.gathered, lakename == "Peter Lake"), aes(x= sampledate, y= concentration, color = depth))+
   geom_point()+
-  ylab(expression("Concentration (μg/L)"))+
-  xlab(expression("Date"))
+  ylab(expression("Concentration (micro g/L)"))+
+  xlab(expression("Date")) +
+  facet_grid(vars(nutrient))
  
   
 print(graph5)
    
-facet_grid(concentration ~ nutrient)
 ```
 
 
@@ -139,10 +143,11 @@ Question: How do these two types of lines affect your interpretation of the data
 ```{r}
 #7 
 
-neonic <- ggplot(subset(neonicotinoids.A05, Conc..Units..Std. == "AL mg/L"), aes(x = Chemical.Name, y = Conc..Mean..Std., fill = as.factor(Chemical.Name)))+
-  geom_bar(stat = "identity", position = "dodge")+
+neonic <- ggplot(subset(neonicotinoids.A05, Conc..Units..Std. == "AI mg/L"), aes(x = Chemical.Name, y = Conc..Mean..Std., fill = as.factor(Chemical.Name)))+
+  geom_boxplot()+
   xlab(expression("Chemical Name"))+
-  ylab(expression("Concentration (mg/L)"))
+  ylab(expression("Concentration (mg/L)"))+
+  labs(fill = "Chemical")
 
 print(neonic)
 ```
