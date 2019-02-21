@@ -50,17 +50,17 @@ Important components of the linear regression are the correlation and the R-squa
 ### Simple Linear Regression
 For the NTL-LTER dataset, can we predict irradiance (light level) from depth?
 ```{r}
-irradiance.regression <- lm(PeterPaul.chem.nutrients$irradianceWater ~ PeterPaul.chem.nutrients$depth)
-# another way to format the lm function
+irradiance.regression <- lm(PeterPaul.chem.nutrients$irradianceWater ~ PeterPaul.chem.nutrients$depth) # predicts irradiance by depth
+# another, more efficent way to format the lm function
 irradiance.regression <- lm(data = PeterPaul.chem.nutrients, irradianceWater ~ depth)
-summary(irradiance.regression)
+summary(irradiance.regression) # tells you the intercept, slope, r^2 value
 
-# Correlation
+# Correlation: gives you the R value
 cor.test(PeterPaul.chem.nutrients$irradianceWater, PeterPaul.chem.nutrients$depth)
 ```
 Question: How would you report the results of this test (overall findings and report of statistical output)?
 
-> ANSWER: 
+> ANSWER: give the r^2 value, p value, degrees of freedom, equation, and say what model you ran
 
 So, we see there is a significant negative correlation between irradiance and depth (lower light levels at greater depths), and that this model explains about 31 % of the total variance in irradiance. Let's visualize this relationship and the model itself. 
 
@@ -75,8 +75,9 @@ An exploratory option to visualize the model fit is to use the function `plot`. 
 4. **Residuals vs. Leverage.** This graph will display potential outliers. The values that fall outside the dashed red lines (Cook's distance) are outliers for the model. Watch for drastic departures of the solid red line from horizontal - this is a sign of a poor model fit.
 
 ```{r, fig.height = 3, fig.width = 4}
-plot(irradiance.regression)
-```
+plot(irradiance.regression) # lets you look at a general fit
+`` 
+
 
 The option best suited for communicating findings is to plot the explanatory and response variables as a scatterplot. 
 
@@ -84,25 +85,28 @@ The option best suited for communicating findings is to plot the explanatory and
 # Plot the regression
 irradiancebydepth <- 
   ggplot(PeterPaul.chem.nutrients, aes(x = depth, y = irradianceWater)) +
-  #ylim(0, 2000) +
+  ylim(0, 2000) +
   geom_point() 
 print(irradiancebydepth) 
+# this relationship looks exponential, so a linear fit isn't good
 ```
 
 Given the distribution of irradiance values, we don't have a linear relationship between x and y in this case. Let's try log-transforming the irradiance values.
 
 ```{r, fig.height = 3, fig.width = 4}
-PeterPaul.chem.nutrients <- filter(PeterPaul.chem.nutrients, irradianceWater != 0)
-irradiance.regression2 <- lm(data = PeterPaul.chem.nutrients, log(irradianceWater) ~ depth)
+PeterPaul.chem.nutrients <- filter(PeterPaul.chem.nutrients, irradianceWater != 0) # remove 0 values bc you can't take the log of 0
+irradiance.regression2 <- lm(data = PeterPaul.chem.nutrients, log(irradianceWater) ~ depth) # compares log of irradiance to depth
 summary(irradiance.regression2)
 plot(irradiance.regression2)
 
 # Add a line and standard error for the linear regression
 irradiancebydepth2 <- 
   ggplot(PeterPaul.chem.nutrients, aes(x = depth, y = irradianceWater)) +
+  scale_y_log10() +  # plots y on a log scale
+  geom_point(alpha = 0.5) + # changes transparency
   geom_smooth(method = "lm") +
-  scale_y_log10() +
-  geom_point() 
+  ylab(expression("Irradiance"))+
+  xlab(expression("Depth (m)"))
 print(irradiancebydepth2) 
 
 # SE can also be removed
@@ -129,11 +133,11 @@ cor.test(PeterPaul.chem.nutrients$irradianceWater, PeterPaul.chem.nutrients$dept
 It is possible, and often useful, to consider multiple continuous explanatory variables at a time in a linear regression. For example, total phosphorus concentration could be dependent on depth and dissolved oxygen concentration: 
 
 ``` {r, fig.height = 3, fig.width = 4}
-TPregression <- lm(data = PeterPaul.chem.nutrients, tp_ug ~ depth + dissolvedOxygen)
+TPregression <- lm(data = PeterPaul.chem.nutrients, tp_ug ~ depth + dissolvedOxygen) 
 summary(TPregression)
 
 TPplot <- ggplot(PeterPaul.chem.nutrients, 
-                 aes(x = dissolvedOxygen, y = tp_ug, color = depth)) +
+                 aes(x = dissolvedOxygen, y = tp_ug, color = depth)) +  # coloring by one of the variables lets you graph 3 variables in 2D
   geom_point() +
   xlim(0, 20)
 print(TPplot)
@@ -143,13 +147,13 @@ We can also make exploratory plots of several continuous data points to determin
 
 ```{r, fig.height = 3, fig.width = 4}
 #install.packages("corrplot")
-library(corrplot)
+library(corrplot)  # lets you look at lots of correlations in a dataset at once
 PeterPaulnutrients <- 
-  PeterPaul.chem.nutrients %>%
+  PeterPaul.chem.nutrients %>%  # note that this is a pipe function
   select(tn_ug:po4) %>%
-  na.omit()
+  na.omit()  # omit the na's
 PeterPaulCorr <- cor(PeterPaulnutrients)
-corrplot(PeterPaulCorr, method = "ellipse")
+corrplot(PeterPaulCorr, method = "ellipse")  # creates a correlation plot
 corrplot.mixed(PeterPaulCorr, upper = "ellipse")
 ```
 ### AIC to select variables
@@ -159,12 +163,12 @@ However, it is possible to over-parameterize a linear model. Adding additional e
 Let's say we want to know which explanatory variables will allow us to best predict total phosphorus concentrations. Potential explanatory variables from the dataset could include depth, dissolved oxygen, temperature, PAR, total N concentration, and phosphate concentration.
 
 ```{r}
-PeterPaul.naomit <- na.omit(PeterPaul.chem.nutrients)
+PeterPaul.naomit <- na.omit(PeterPaul.chem.nutrients)  # gets rid of the na's
 TPAIC <- lm(data = PeterPaul.naomit, tp_ug ~ depth + dissolvedOxygen + 
               temperature_C + tn_ug + po4)
-step(TPAIC)
+step(TPAIC)  # the lower the aic, the better the correlation
 TPmodel <- lm(data = PeterPaul.naomit, tp_ug ~ temperature_C + tn_ug)
-summary(TPmodel)
+summary(TPmodel)  # run the best fit model by itself once you figure out which one is best
 
 ```
 
@@ -175,8 +179,8 @@ Let's say we wanted to predict total nitrogen concentrations by depth and by lak
 
 ```{r, fig.height = 3, fig.width = 4}
 # main effects
-TNancova.main <- lm(data = PeterPaul.chem.nutrients, tn_ug ~ lakename + depth)
-summary(TNancova.main)
+TNancova.main <- lm(data = PeterPaul.chem.nutrients, tn_ug ~ lakename + depth) # gives you different regressions for the different variables
+summary(TNancova.main)  # the first intercept number is for paul lake, the second is for peter lake
 
 # interaction effects
 TNancova.interaction <- lm(data = PeterPaul.chem.nutrients, tn_ug ~ lakename * depth)
