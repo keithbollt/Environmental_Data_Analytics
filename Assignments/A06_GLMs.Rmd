@@ -1,6 +1,6 @@
 ---
 title: "Assignment 6: Generalized Linear Models"
-author: "Student Name"
+author: "Keith Bollt"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -34,8 +34,22 @@ The completed exercise is due on Tuesday, 26 February, 2019 before class begins.
 
 ```{r}
 #1
+getwd()
+library(tidyverse)
+library(ggplot2)
+library(corrplot)
+
+Neonics.A06 <- 
+  read.csv("V:/ENV_872_Project_Directory/Data/Raw/ECOTOX_Neonicotinoids_Mortality_raw.csv")
+chemistry.physics.raw.A06 <- 
+  read.csv("V:/ENV_872_Project_Directory/Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv")
 
 #2
+mytheme.A06 <- 
+  theme_classic(base_size = 14)+
+  theme(axis.text = element_text(color = "blue"),
+  legend.position = "top")
+theme_set(mytheme.A06)
 
 ```
 
@@ -50,16 +64,40 @@ Research question: Were studies on various neonicotinoid chemicals conducted in 
 
 ```{r}
 #3
+Neonics.A06$Chemical.Name <- as.character(Neonics.A06$Chemical.Name)
+
+choices <- length(unique(Neonics.A06$Chemical.Name))
+summary(choices)  # The answer is 9 different chemicals
 
 #4
+summary(Neonics.A06$Chemical.Name) # This generates the different chemical names. I should have just run this code for q3 as well...
+
+shapiro.test(Neonics.A06$Pub..Year[Neonics.A06$Chemical.Name == "Acetamiprid"])
+shapiro.test(Neonics.A06$Pub..Year[Neonics.A06$Chemical.Name == "Clothianidin"])
+shapiro.test(Neonics.A06$Pub..Year[Neonics.A06$Chemical.Name == "Dinotefuran"])
+shapiro.test(Neonics.A06$Pub..Year[Neonics.A06$Chemical.Name == "Imidacloprid"])
+shapiro.test(Neonics.A06$Pub..Year[Neonics.A06$Chemical.Name == "Imidaclothiz"])
+shapiro.test(Neonics.A06$Pub..Year[Neonics.A06$Chemical.Name == "Nitenpyram"])
+shapiro.test(Neonics.A06$Pub..Year[Neonics.A06$Chemical.Name == "Nithiazine"])
+shapiro.test(Neonics.A06$Pub..Year[Neonics.A06$Chemical.Name == "Thiacloprid"])
+shapiro.test(Neonics.A06$Pub..Year[Neonics.A06$Chemical.Name == "Thiamethoxam"])
+
+q4.plot <- ggplot(Neonics.A06, aes(x = Pub..Year, color = Chemical.Name)) +
+  geom_freqpoly(stat = "count")
+qqnorm(Neonics.A06$Pub..Year); qqline(Neonics.A06$Pub..Year)
+print(q4.plot)
+#No. The p-value for each Shapiro Test is less than 0.05, so we reject the null hypothesis that the data is normally distributed.
 
 #5
+neonics.kw <- kruskal.test(Neonics.A06$Chemical.Name ~ Neonics.A06$Pub..Year)
+neonics.kw
 
+# No. The p-value < 0.05, so I reject the null hypothesis that there is no significant difference between the variances.
 ```
 
 6. Based on your results, which test would you choose to run to answer your research question?
 
-> ANSWER: 
+> ANSWER: Dunn Test
 
 7. Run this test below. 
 
