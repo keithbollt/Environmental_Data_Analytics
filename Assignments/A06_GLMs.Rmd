@@ -38,6 +38,7 @@ getwd()
 library(tidyverse)
 library(ggplot2)
 library(corrplot)
+knitr::opts_chunk$set(fig.height = 9, fig.width = 7)
 
 Neonics.A06 <- 
   read.csv("V:/ENV_872_Project_Directory/Data/Raw/ECOTOX_Neonicotinoids_Mortality_raw.csv")
@@ -120,7 +121,7 @@ print(Neonics.boxplot)
 
 9. How would you summarize the conclusion of your analysis? Include a sentence summarizing your findings and include the results of your test in parentheses at the end of the sentence. 
 
-> ANSWER: The studies on the various neonicotides were conducted in different years. (after running a Dunn test on the nonnormal data distribution of chemical vs publication year, I found that the relationship between every chemical pairing combination had significantly different publication years. The z-scores were both positive and negative depending on the pairings, but the most important finding from the Dunn test was that the p-values were below 0.05 for every combination.)
+> ANSWER: The studies on the various neonicotides were conducted in different years. (After running a Dunn test on the nonnormal data distribution of chemical vs publication year, I found that the relationship between every chemical pairing combination had significantly different publication years. The z-scores were both positive and negative depending on the pairings, but the most important finding from the Dunn test was that the p-values were below 0.05 for every combination.)
 
 ## NTL-LTER test
 Research question: What is the best set of predictors for lake temperatures in July across the monitoring period at the North Temperate Lakes LTER? 
@@ -170,16 +171,17 @@ summary(temperature.ancova.interaction)
 15. Is there an interaction between depth and lakename? How much variance in the temperature observations does this explain?
 
 > ANSWER: There is not a significant interaction between depth and lakename. The depth:lakename interaction for every lake in the dataset had a Pr(>|t|) value (basically a p-value) greater than 0.05.
-The ANCOVA generated an r^2 value of 0.77, which means that accounting for the interaction between depth and lakename creates an r^2 value that is 0.04 higher than just accounting for depth alone.
+This model explains 77 percent of the variance in the temperature observations.
 
 16. Create a graph that depicts temperature by depth, with a separate color for each lake. Add a geom_smooth (method = "lm", se = FALSE) for each lake. Make your points 50 % transparent. Adjust your y axis limits to go from 0 to 35 degrees. Clean up your graph to make it pretty. 
 
 ```{r}
 #16
-temperature.vs.depth.plot <- ggplot(chemistry.physics.processed.A06, aes(x = depth, y = tn_ug, color = lakename)) + 
-  geom_point() + 
+temperature.vs.depth.plot <- ggplot(chemistry.physics.processed.A06, aes(x = temperature_C, y = depth, color = lakename)) + 
+  geom_point(alpha = 0.5) + 
   geom_smooth(method = "lm", se = FALSE) +
-  xlim(0, 10)
-print(TNplot)
+  ylim(0, 35)+
+  labs(x= "Temperature (Celsius)", y = "Depth", color = "Lake Name")
+print(temperature.vs.depth.plot)
 ```
 
