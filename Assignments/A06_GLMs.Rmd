@@ -104,15 +104,23 @@ neonics.kw
 8. Generate a boxplot representing the range of publication years for each chemical. Adjust your graph to make it pretty.
 ```{r}
 #7
+library(FSA)
+dunnTest(Neonics.A06$Pub..Year, Neonics.A06$Chemical.Name)    
 
 #8
+Neonics.boxplot <- ggplot(Neonics.A06, aes(x = Chemical.Name, y = Pub..Year, color = Chemical.Name) )+
+  geom_boxplot()+
+  xlab(expression("Chemical Name"))+
+  ylab(expression("Publication Year"))+
+  labs(color = "Chemical Name")
+print(Neonics.boxplot)
 
 ```
 
 
 9. How would you summarize the conclusion of your analysis? Include a sentence summarizing your findings and include the results of your test in parentheses at the end of the sentence. 
 
-> ANSWER: 
+> ANSWER: The studies on the various neonicotides were conducted in different years. (after running a Dunn test on the nonnormal data distribution of chemical vs publication year, I found that the relationship between every chemical pairing combination had significantly different publication years. The z-scores were both positive and negative depending on the pairings, but the most important finding from the Dunn test was that the p-values were below 0.05 for every combination.)
 
 ## NTL-LTER test
 Research question: What is the best set of predictors for lake temperatures in July across the monitoring period at the North Temperate Lakes LTER? 
@@ -127,30 +135,51 @@ Research question: What is the best set of predictors for lake temperatures in J
 
 ```{r}
 #11
+chemistry.physics.processed.A06 <- 
+  chemistry.physics.raw.A06 %>%
+  filter(daynum == 182:212) %>%
+  select(lakename, year4, daynum, depth, temperature_C) %>%
+  na.omit()
 
 #12
+chemistry.A06.AIC <- lm(data = chemistry.physics.processed.A06, temperature_C ~ year4 + daynum + 
+              depth)
+step(chemistry.A06.AIC)  
+
+# the lower the aic, the better the correlation. Depth by itself produced the lowest AIC, and therefore the best correlation with temperature.
+
+temperature.model <- lm(data = chemistry.physics.processed.A06, temperature_C ~ depth) 
+summary(temperature.model)
 
 ```
 
 13. What is the final linear equation to predict temperature from your multiple regression? How much of the observed variance does this model explain?
 
-> ANSWER: 
+> ANSWER: temperature_C = 22 - (1.96 * depth) + error
+This equation has an r^2 value of about 0.73, so this equation explains about 73% of the observed variance.
 
 14. Run an interaction effects ANCOVA to predict temperature based on depth and lakename from the same wrangled dataset.
 
 ```{r}
 #14
+temperature.ancova.interaction <- lm(data = chemistry.physics.processed.A06, temperature_C ~ depth * lakename)
+summary(temperature.ancova.interaction)
 
 ```
 
 15. Is there an interaction between depth and lakename? How much variance in the temperature observations does this explain?
 
-> ANSWER: 
+> ANSWER: There is not a significant interaction between depth and lakename. The depth:lakename interaction for every lake in the dataset had a Pr(>|t|) value (basically a p-value) greater than 0.05.
+The ANCOVA generated an r^2 value of 0.77, which means that accounting for the interaction between depth and lakename creates an r^2 value that is 0.04 higher than just accounting for depth alone.
 
 16. Create a graph that depicts temperature by depth, with a separate color for each lake. Add a geom_smooth (method = "lm", se = FALSE) for each lake. Make your points 50 % transparent. Adjust your y axis limits to go from 0 to 35 degrees. Clean up your graph to make it pretty. 
 
 ```{r}
 #16
-
+temperature.vs.depth.plot <- ggplot(chemistry.physics.processed.A06, aes(x = depth, y = tn_ug, color = lakename)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) +
+  xlim(0, 10)
+print(TNplot)
 ```
 
