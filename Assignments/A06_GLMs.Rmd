@@ -171,7 +171,7 @@ summary(temperature.ancova.interaction)
 15. Is there an interaction between depth and lakename? How much variance in the temperature observations does this explain?
 
 > ANSWER: There is not a significant interaction between depth and lakename. The depth:lakename interaction for every lake in the dataset had a Pr(>|t|) value (basically a p-value) greater than 0.05.
-This model explains 77 percent of the variance in the temperature observations.
+This model explains 77 percent of the variance in the temperature observations, which is about 4% more than if the interaction wasn't accounted for.
 
 16. Create a graph that depicts temperature by depth, with a separate color for each lake. Add a geom_smooth (method = "lm", se = FALSE) for each lake. Make your points 50 % transparent. Adjust your y axis limits to go from 0 to 35 degrees. Clean up your graph to make it pretty. 
 
