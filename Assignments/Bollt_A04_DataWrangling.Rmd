@@ -129,7 +129,7 @@ EPAair_O3_PM25_NC1718_filter <-
   filter(Site.Name == "Blackstone"| Site.Name == "Bryson City" | Site.Name == "Triple Oak") %>%
   mutate(month = month(Date)) %>%
   mutate(year = year(Date))
-  
+dim(EPAair_O3_PM25_NC1718_filter)
 #9
 EPA.airdata.spread <- spread(EPAair_O3_PM25_NC1718_filter, AQS_PARAMETER_DESC, DAILY_AQI_VALUE)
 #10
