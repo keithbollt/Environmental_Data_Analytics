@@ -1,6 +1,6 @@
 ---
 title: "Assignment 8: Time Series Analysis"
-author: "Student Name"
+author: "Keith Bollt"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -32,13 +32,33 @@ The completed exercise is due on Tuesday, 19 March, 2019 before class begins.
 
 Question: Did you do this?
 
-> ANSWER: 
+> ANSWER: Yes (looking at thermocline change over time)
 
 ## Set up your session 
 2. Set up your session. Upload the EPA air quality raw dataset for PM2.5 in 2018, and the processed NTL-LTER dataset for nutrients in Peter and Paul lakes. Build a ggplot theme and set it as your default theme. Make sure date variables are set to a date format.
 
 ```{r}
+getwd()
+library(tidyverse)
+library(lubridate)
+library(nlme)
+library(lsmeans)
+library(multcompView)
+#install.packages("trend")
+library(trend)
 
+EPA.air.raw <- read.csv("V:/ENV_872_Project_Directory/Data/Raw/EPAair_PM25_NC2018_raw.csv")
+PeterPaul.processed <- read.csv("V:/ENV_872_Project_Directory/Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv")
+View(EPA.air.raw)
+View(PeterPaul.processed)
+
+mytheme <- theme_classic(base_size = 13) +
+  theme(axis.text = element_text(color = "black"), 
+        legend.position = "top")
+theme_set(mytheme)
+
+PeterPaul.processed$sampledate <- as.Date(PeterPaul.processed$sampledate,format = "%Y-%m-%d")
+EPA.air.raw$Date <- as.Date(EPA.air.raw$Date, format = "%m/%d/%y")
 ```
 
 
@@ -51,6 +71,10 @@ Research question: Do PM2.5 concentrations have a significant trend in 2018?
 3a. Illustrate PM2.5 concentrations by date. Do not split aesthetics by site.
 
 ```{r}
+PM2.5_plot <- ggplot(EPA.air.raw, aes(x = Date, y = Daily.Mean.PM2.5.Concentration))+
+  geom_point()+
+  labs(x= "Date", y = "Daily Mean PM 2.5 Concentration")
+PM2.5_plot
 
 ```
 
@@ -63,23 +87,42 @@ PM2.5 = PM2.5[!duplicated(PM2.5$Date),]
 3d. Run a mixed effects model. 
 
 ```{r}
+EPA.air.raw = EPA.air.raw[order(EPA.air.raw[,'Date'],-EPA.air.raw[,'Site.ID']),]
+EPA.air.raw = EPA.air.raw[!duplicated(EPA.air.raw$Date),]
 
+TempTest.HW.auto <- lme(data = EPA.air.raw,
+                     Daily.Mean.PM2.5.Concentration ~ Date, 
+                     random = ~1|Site.Name)  
+TempTest.HW.auto
+ACF(TempTest.HW.auto)
+# 51.38% autocorrelation
+
+TempTest.HW.mixed <- lme(data = EPA.air.raw,
+                     Daily.Mean.PM2.5.Concentration ~ Date,
+                     random = ~1|Site.Name,
+                     correlation = corAR1(form = ~ Date|Site.Name, value = 0.5138), #correlation from previous model, sampledate/lakename because the model can only do one lake at a time
+                     #define method as restricted maximum likelihood
+                     method = "REML")
+summary(TempTest.HW.mixed)
 ```
 
 Is there a significant increasing or decreasing trend in PM2.5 concentrations in 2018? 
 
-> ANSWER: 
+> ANSWER: No, there is not. The two variables tested generated p-values of 0.17 and 0.21, respectively. This means we cannot reject the null hypothesis that there is not a significant trend in PM2.5 concentrations in 2018.
 
 3e. Run a fixed effects model with Date as the only explanatory variable. Then test whether the mixed effects model is a better fit than the fixed effect model. 
 
 ```{r}
-
+TempTest.HW.fixed <- gls(data = EPA.air.raw,
+                      Daily.Mean.PM2.5.Concentration ~ Date, 
+                      method = "REML")
+anova(TempTest.HW.mixed, TempTest.HW.fixed)
 ```
 
 
 Which model is better?
 
-> ANSWER: 
+> ANSWER: The mixed model is better. It has an AIC of 1756, which is quite a bit lower than the fixed model's AIC of 1865. In addition, the p-value for whether there is a significantly different fit between the two models is <0.05, which means that we can reject the null hypothesis that they do not have a significantly different fit.
 
 
 ## Run a Mann-Kendall test
@@ -89,17 +132,45 @@ Research question: Is there a trend in total N surface concentrations in Peter a
 4. Duplicate the Mann-Kendall test we ran for total P in class, this time with total N for both lakes. Make sure to run a test for changepoints in the datasets (and run a second one if a second change point is likely). 
 
 ```{r}
+PeterPaul.nutrients.surface <- 
+  PeterPaul.processed %>%
+  filter(depth == 0) %>%
+  filter(!is.na(tn_ug))
+Peter.nutrients.surface <- filter(PeterPaul.nutrients.surface, lakename == "Peter Lake")
+Paul.nutrients.surface <- filter(PeterPaul.nutrients.surface, lakename == "Paul Lake")
 
+ggplot(PeterPaul.nutrients.surface, aes(x = sampledate, y = tn_ug, color = lakename)) + 
+  geom_point() +
+  scale_color_manual(values = c("#7fcdbb", "#253494"))
+#Peter Lake
+mk.test(Peter.nutrients.surface$tn_ug)
+pettitt.test(Peter.nutrients.surface$tn_ug)  #break at row 36
+
+mk.test(Peter.nutrients.surface$tn_ug[1:35])  # no trend
+mk.test(Peter.nutrients.surface$tn_ug[36:98]) #significant trend
+pettitt.test(Peter.nutrients.surface$tn_ug[36:98]) #break at row 36+21 = 57,
+
+#A break in the data in June 1994 doesn't really make sense, because nothing changed in how the lake was managed in 1994. I am going to only put in one breakline for the data.
+
+#Paul Lake
+mk.test(Paul.nutrients.surface$tn_ug) # no trend
+pettitt.test(Paul.nutrients.surface$tn_ug) # You can still generate breaks in your data even if no break should occur.
 ```
 
 
 What are the results of this test?
 
-> ANSWER: 
+> ANSWER: The Mann-Kendall test for Peter Lake demonstrates that there is one break in the data that both is borne out of the data and makes sense knowing how Peter Lake was managed in the 1990s. This break took place on June 2, 1993.
+The Mann-Kendall test for Paul Lake showed there is not a significant trend in the data. Given what I know about how Paul Lake was managed in the 1990s, there is no reason to suspect that the breakline suggested by the Pettitt test for Paul Lake represents an actual break in the data.
+
 
 5. Generate a graph that illustrates the TN concentrations over time, coloring by lake and adding vertical line(s) representing changepoint(s).
 
 ```{r}
-
+ggplot(PeterPaul.nutrients.surface, aes(x = sampledate, y = tn_ug, color = lakename)) + 
+  geom_point() +
+  geom_vline(xintercept= as.Date("1993-06-02"), color = "#253494")+
+  scale_color_manual(values = c("#7fcdbb", "#253494"))+
+  labs(x = "Date", y= "Nitrogen Concentration", color = "Lake Name")
 ```
 
