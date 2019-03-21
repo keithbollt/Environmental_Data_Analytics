@@ -291,7 +291,7 @@ The `sf` package also allows us to read many existing data formats, including Ar
 Below we read in the USA counties shapefile, filtering for just the NC features (NC has a state FIPS code of 37...) 
 ```{r read the USA county shapfile, subsetting for NC}
 counties_sf<- st_read('./Data/Spatial/cb_2017_us_county_20m.shp') %>% 
-  filter(STATEFP == 37) #Filter for just NC Counties
+  filter(STATEFP == 37) #Filter for just NC Counties, turns a spatial dataset into an R dataframe
 
 #CRS (Is this the same as the EPA Dataset?)
 st_crs(counties_sf)
@@ -317,24 +317,24 @@ mapView(counties_sf)
 
 ```{r read HUCs shapefile}
 #Read the shapefile into an sf dataframe named "huc8_sf"
-huc8_sf <-   
+huc8_sf <-  st_read('./Data/Spatial/huc_250k_nc.shp')
 
 #Check the CRS
-
+st_crs(huc8_sf)
 
 #Exaimine the column names
-
+names(huc8_sf)
 
 #View the data as a map
-
+mapView(huc8_sf)
 ```
 
 > _Challenge_: Read in the NC 8-Digit HUC dataset again, but this time _filter_ the data so the result only includes the one with a HUC_NAME value of 'Upper Neuse'.
 
 ```{r Select the Upper Neuse HUC 8}
 #Read the shapefile into an sf dataframe
-upperNeuse_sf <-  
-  
+upperNeuse_sf <-  st_read('./Data/Spatial/huc_250k_nc.shp') %>%
+  filter(HUC_NAME == "Upper Neuse")
 
 ```
 
@@ -343,11 +343,10 @@ upperNeuse_sf <-
 ```{r Dissolve all counties into a single feature}
 #Aggregate the data using group_by and summarize, just as you would a non-spatial dataframe
 state_sf <- counties_sf %>% 
-  group_by('STATEFP') %>% 
-  summarize(ALAND = sum(ALAND))
+  summarize(ALAND = sum(ALAND))  #this aggregates all the counties in NC into a single shape
 
 #View the data
-mapview(state_sf)
+mapview(state_sf) #This maps the state of North Carolina
 
 #Alternatively, we could use the `st_union` function
 state_sf2 <- st_union(counties_sf)
@@ -357,7 +356,9 @@ mapview(state_sf2)
 > Now you try it: Aggregate the HUC data on the SUB attribute, computing the sum of the "AREA" field and view the result. 
 
 ```{r Aggregate the HUC data on an attribute, saving as huc2_sf}
-huc2_sf <- 
+huc2_sf <- huc8_sf %>%
+  group_by(SUB) %>%
+  summarize(AREA = sum(AREA))
   
   
 mapview(huc2_sf)
@@ -403,7 +404,7 @@ ggplot()  +
   geom_sf(data = state_sf_utm, color='red',size=2) + 
   scale_fill_gradient(low="yellow", high="darkgreen")
 
-#Right order
+#Right order, the order of the data layers is important
 ggplot() +
   geom_sf(data = state_sf_utm, color='red',size=2) +
   geom_sf(data = counties_sf_utm, aes(fill = ALAND), color = 'white')  +
@@ -459,10 +460,13 @@ mapview(huc2_UTM_nc)
 > Exercise: Try subsetting the huc2_UTM dataset for SUB = 0302, then clipping counties with that subset.
 
 ```{r EXERCISE: Clip the counties dataset with the border of HUC 0302}
-huc0302_counties <- 
+huc0302 <- huc2_utm %>%
+  filter(SUB == "0302") 
+mapView(huc0302)
+huc0302_sub <- st_intersection(huc0302,counties_sf_utm)
   
 #Map the product, showing values by land area
-mapview(huc0302_counties['ALAND'])
+mapview(huc0302_sub['ALAND'])
 ```
 
 
@@ -477,6 +481,8 @@ demog_df <- read.csv('./Data/Spatial/NC_Demography.csv') %>%
 #Join the two datasets using "GEOID" from the left dataset and "FIPS" from the right
 counties_sf_utm_join <- counties_sf_utm %>% 
   left_join(y = demog_df,by = c("GEOID" =  "FIPS"))
+
+#for the HW, you have to use st_as_sf to convert to a spatial data frame
 
 #Check the dimensions
 dim(counties_sf_utm)
@@ -523,14 +529,14 @@ myMap
 #Combine the centroids into one featue and construct a convex hull around them
 triCo_centroids_chull <- triCo_centroids %>% 
   st_union() %>% 
-  st_convex_hull()
+  st_convex_hull()  #this creates a polygon connecting the four centroids
 myMap <- myMap + geom_sf(data = triCo_centroids_chull, color = 'red', fill=NA)
 myMap
 
 #Combine the centroids into one feature and draw voronoi polygons
 triCo_centroids_voronoi <- triCo_centroids %>% 
   st_union() %>% 
-  st_voronoi()
+  st_voronoi()  #shows what area is closest to a given point
 myMap <- myMap + geom_sf(data = triCo_centroids_voronoi, color = 'purple', fill=NA)
 myMap
 
@@ -557,7 +563,7 @@ resultMask <- st_intersects(counties_sf_utm,
                             sparse = FALSE) #The `sparse` option returns a Boolean mask
 
 #Filter the counties dataset using the boolean mask
-selCounties <- counties_sf_utm[resultMask,]
+selCounties <- counties_sf_utm[resultMask,]  #only one county is true
 
 #Map the results
 mapView(counties_sf[resultMask,])
@@ -566,7 +572,7 @@ mapView(counties_sf[resultMask,])
 > Questions: how might we use the `st_buffer` function to show all counties within 30km of the site?
 
 ```{r Select counties within a 30 km area from the site}
-
+#buffer the coordinate by 30km at the beginning
                             
 ```
 
