@@ -58,7 +58,7 @@ library(mapview)
 mapView(counties_sf)
 ```
 > QUESTION: What is the EPSG code of the Counties dataset? Using http://spatialreference.org, is this a geographic or a projected coordinate system? (Or, does this CRS use angular or planar coordinate units?) To what datum is this CRS associated?  
-> ANSWER: The EPSG code is 4269.This corresponds to NAD 1983. It is a geographic coordinate system.
+> ANSWER: The EPSG code is 4269. It is a geographic coordinate system. This CRS corresponds to NAD 1983. 
 
 ### 3. Read in gage locations csv as a dataframe, then display the column names it contains
 Next we'll read in some USGS/NWIS gage location data I've added to the `Data/Raw` folder. These 
@@ -134,7 +134,7 @@ gageheight_df <-
 names(gageheight_df)
 
 #Join location data to it
-allgage_df <- merge(x = Gage_df, y = gageheight_df, by = "site_no", all.x = TRUE)
+allgage_df <- merge(x = gageheight_df, y = Gage_df, by = "site_no")
 
 #Convert back to sf dataframe
 allgage_sf <- st_as_sf(allgage_df, coords = c('dec_long_va','dec_lat_va'), crs= 4269)
@@ -148,7 +148,10 @@ Now we can examine where the flooding appears most acute by visualizing gage hei
  * Show the magnitude of gage height by color, shape, other visualization technique.
 ```{r}
 #Plot the values
-
+ggplot() + 
+  geom_sf(data = counties_sf, color='red') +
+  geom_sf(data = allgage_sf, aes(color = gage_ht), size = 2) +
+  labs(color = "Gage Height")
 ```
 
 ## SPATIAL ANALYSIS
@@ -160,12 +163,17 @@ transform our data into a projected coordinate system. We'll choose UTM Zone 14N
 * Using ggplot, plot the data so that each can be seen as different colors
 ```{r}
 #Transform the counties and gage location datasets to UTM Zone 14
-
+allgage_utm <- st_transform(allgage_sf, c=32614)
+counties_utm <- st_transform(counties_sf, c=32614)
 #Plot the data
-
+ggplot()+
+  geom_sf(data = counties_utm, color='red') +
+  geom_sf(data = allgage_utm, aes(color = site_no), size = 2) +
+  labs(color = "Site Number")+
+  scale_color_gradient(low="yellow", high="darkgreen")
 ```
 > QUESTION: The shape of Nebraska should look a bit different than the one created in Step 5? Why?
-> ANSWER: 
+> ANSWER: It has been transformed from a geographic coordinate system to a projected coordinate system.
 
 ### 9. Select the gages falling within a given county
 Now let's zoom into a particular county and examine the gages located there. 
@@ -179,11 +187,35 @@ Now let's zoom into a particular county and examine the gages located there.
  * and the gage sites in that county
 ```{r}
 #Select the county
+lancaster_co <- counties_utm %>%
+  filter(COUNTYFP == "109")
+lancasterco_in2km <- st_buffer(lancaster_co, -2000)
+mapView(lancasterco_in2km)
+
+LancasterMask <- st_intersects(counties_utm,
+                            lancasterco_in2km, 
+                            sparse = FALSE)
+
+selCounties <- counties_utm[LancasterMask,] 
+mapView(selCounties)
 
 #Select gages within 
+gagemask <- st_intersects(selCounties,
+                              allgage_utm,
+                              sparse = FALSE)
+View(gagemask)
+Lancastergages <- allgage_utm[gagemask,]
+View(Lancastergages)
+mapView(Lancastergages)
 
 #Plot
-
+ggplot()+
+  geom_sf(data = counties_utm, color='red') +
+  geom_sf(data = selCounties, color = 'blue')+
+  geom_sf(data = Lancastergages, aes(color = site_no), size = 2) +
+  labs(color = "Site Number")+
+  scale_color_gradient(low="yellow", high="darkgreen")
+  
 ```
 
 
