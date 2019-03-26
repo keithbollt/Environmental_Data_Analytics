@@ -231,11 +231,15 @@ attributes of the county in which it is located.
   * Display each gage size proportional to its "gage_ht" value
 ```{r Spatial Join}
 #Join features
-
+gagejoin <- st_join(allgage_utm, counties_utm, sparse = TRUE, prepared = TRUE, left = TRUE,largest = FALSE)
+mapView(gagejoin)
 #Show column names
-
+names(gagejoin)
 #Plot
-
+ggplot()+
+  geom_sf(data = counties_utm, color = 'red') +
+  geom_sf(data = gagejoin, aes(color= NAME, size = gage_ht, alpha = 0.5))+
+  labs(color = "County Name", size = "Gage Height")
 ```
 
 ### 11. Summarize data by county
@@ -250,11 +254,14 @@ it's mean gage height.
  * Not all counties will have data
 ```{r}
 #Group and summarize
+meangage <- aggregate(gagejoin [4], list(gagejoin$NAME), mean)
 
 #Convert result to a simple dataframe
+gage_no_geometry <- st_drop_geometry(meangage)
 
 #Join summary to County fc
-
+library(dplyr)
+final_gagedata <- merge(x = counties_utm, y = gage_no_geometry)
 #Plot
 
 ```
