@@ -1,12 +1,15 @@
 ---
-title: "Assignment: Spatial Analysis in R"
+title: 'Assignment: Spatial Analysis in R'
 author: "Keith Bollt"
+geometry: margin=2.54cm
 output:
   html_document:
-    toc: true
+    theme: cosmo
+    toc: yes
     toc_depth: 2
-    theme: "cosmo"
-geometry: margin=2.54cm
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
 editor_options:
   chunk_output_type: console
 ---
@@ -47,7 +50,7 @@ Nebraska's state FIPS code is `31` (as North Carolina's was `37`).
 * Plot the records as a map (in any format)
 ```{r Read the county data into an sf dataframe}
 #Read in Counties shapefile into an sf dataframe, filtering for just NC counties
-counties_sf<- st_read('./Data/Spatial/cb_2017_us_county_20m.shp') %>% 
+counties_sf<- st_read('V:/ENV_872_Project_Directory/Data/Spatial/cb_2017_us_county_20m.shp') %>% 
   filter(STATEFP == 31)
 
 #Reveal the CRS of the counties features
@@ -261,8 +264,10 @@ gage_no_geometry <- st_drop_geometry(meangage)
 
 #Join summary to County fc
 library(dplyr)
-final_gagedata <- merge(x = counties_utm, y = gage_no_geometry)
+final_gagedata <- left_join(x = counties_utm, y = gage_no_geometry, by = c("NAME" = "Group.1"))
 #Plot
-
+ggplot()+
+  geom_sf(data = final_gagedata, aes(fill = gage_ht))+
+  labs(fill = "Gage Height (m)")
 ```
 

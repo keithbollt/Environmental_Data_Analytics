@@ -24,21 +24,36 @@ editor_options:
     + Can be named {r name} to facilitate navigation and autoreferencing
     + Chunk options allow for flexibility when the code runs and when the document is knitted
 3. **Text** with formatting options for readability in knitted document
+```{r}
+
+```
 
 A handy cheat sheet for R markdown can be found [here](https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf). Another one can be found [here](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf).
 
 ## WHY R MARKDOWN?
 
 <Fill in our discussion below with bullet points. Use italics and bold for emphasis>
+- code output and text in one document, just code in another
+- convert code to a useful format (pdf, etc.)
+-And many more...
 
 ## TEXT EDITING CHALLENGE
 
 Create a table below that details the example datasets we have been using in class. The first column should contain the name of the dataset and the second column should include some relevant information about the dataset.
 
+Dataset    |   Description
+-------------------  |   ------------------------------------------------
+EPA Air    |   This dataset has data on air quality, specifically on ozone and something else I forget
+Hydrology  |   This dataset has USGS hydrology data on sites that I don't remember the locations of and don't feel like looking for
+NTLR Data  |   This dataset looks at chemistry and physics, and also nutrient data from several lakes in Wisconsin, including Peter and Paul Lake, but there are something like nine lakes in total. From every indication, although we cannot be 100 percent sure without visiting the lakes themselves, these lakes are filled with water, and not, as some are led to believe, melted cheese or Milwaukee-brewed beer.
+ECOTOX Neonicotoids Data | This dataset contains data on dead insects and the chemicals that killed them, I think
 
 ## R CHUNK EDITING CHALLENGE
 ### Installing packages
 Create an R chunk below that installs the package `knitr`. Instead of commenting out the code, customize the chunk options such that the code is not evaluated (i.e., not run). 
+```{r, eval = FALSE}
+install.packages(c("knitr"))
+```
 
 
 ### Setup
@@ -47,6 +62,16 @@ Create an R chunk below called "setup" that checks your working directory, loads
 Load the NTL-LTER_Lake_Nutrients_Raw dataset, display the head of the dataset, and set the date column to a date format.
 
 Customize the chunk options such that the code is run but is not displayed in the final document.
+```{r, setup, include=FALSE}
+getwd()
+library(tidyverse)
+library(knitr)
+mytheme <- theme_set(theme_classic(base_size = 13.14159))
+lakedata <- read.csv("V:/ENV_872_Project_Directory/Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv")
+head(lakedata)
+as.Date(lakedata$sampledate, format = "%m/%d/%y")
+ 
+```
 
 
 ### Data Exploration, Wrangling, and Visualization
