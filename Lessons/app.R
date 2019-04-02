@@ -16,7 +16,7 @@ ui <- fluidPage(
          sliderInput('n',
                      'sample size',
                      min = 0,
-                     max = 500,
+                     max = 500000,
                      value = 100),
          sliderInput('mu',
                      withMathJax('$$\\mu$$'), 
@@ -48,11 +48,11 @@ server <- function(input, output) {
      
      n <- input$n
      if(n < 25){
-       bins <- 10
+       bins <- 7
      } else if(n < 50){
-       bins <- 20
+       bins <- 14
      } else if(n <= 500){
-       bins <- 30
+       bins <- 21
      }
      
      set.seed(1001) # prevent output from changing based on plot type
