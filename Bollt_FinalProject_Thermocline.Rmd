@@ -111,7 +111,7 @@ Paultemp_visualization <- ggplot(Paullake_processed, aes(x = sampledate, y = tem
   labs(x = "Date", y = "Temperature in Celsius", color = "Temperature (Degrees Celsius)")+
   scale_color_gradient(low = "blue", high = "red")
 Paultemp_visualization
-#maybe a slight upward trend in tnperature at 10m over time
+#maybe a slight upward trend in temperature at 10m over time
 
 Paulo2_visualization <- ggplot(Paullake_processed, aes(x = sampledate, y = dissolvedOxygen, color = dissolvedOxygen))+
   geom_point()+
