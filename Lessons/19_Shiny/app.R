@@ -1,5 +1,6 @@
 library(shiny)
 library(ggplot2)
+install.packages("colourpicker")
 library(colourpicker)
 
 
@@ -45,12 +46,19 @@ ui <- navbarPage('probability distributions', id = 'nav', # specifies panels at 
                           sidebarLayout(
                             sidebarPanel(
                               sliderInput('pn',
-                                          'sample size'),
+                                          'sample size',
+                                          min = 0,
+                                          max = 500,
+                                          value = 100),
                               sliderInput('lambda',
                                           '$$\\lambda$$'),
-                              checkboxInput('phist', label = 'histogram', value = TRUE), 
-                              checkboxInput('pdens', label = 'density', value = TRUE),
-                              colourInput('pcol', label = 'select a color')
+                              min = 0,
+                              max = 10,
+                              value = 0,
+                              step = 0.1,
+                              checkboxInput('nhist', label = 'histogram', value = TRUE), 
+                              checkboxInput('ndens', label = 'density', value = TRUE),
+                              colourInput('pcol', label = 'carnelian')
                             ),
                             mainPanel(
                               tabsetPanel(position = 'below',
